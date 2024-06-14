@@ -1,21 +1,21 @@
-﻿# Light.EntityFrameworkCore
+﻿# Light.DatabaseAccess.EntityFrameworkCore
 
 *Implements the database access abstractions from [Light.SharedCore](https://github.com/feO2x/Light.SharedCore/) for Entity Framework Core.*
 
 ![Light Logo](light-logo.png)
 
-[![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://github.com/feO2x/Light.EntityFrameworkCore/blob/main/LICENSE)
-[![NuGet](https://img.shields.io/badge/NuGet-1.0.0-blue.svg?style=for-the-badge)](https://www.nuget.org/packages/Light.EntityFrameworkCore/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://github.com/feO2x/Light.DatabaseAccess.EntityFrameworkCore/blob/main/LICENSE)
+[![NuGet](https://img.shields.io/badge/NuGet-1.0.0-blue.svg?style=for-the-badge)](https://www.nuget.org/packages/Light.DatabaseAccess.EntityFrameworkCore/)
 
 ## How to install
 
-Light.EntityFrameworkCore is compiled against .NET 8 and available as a NuGet package. It can be installed via:
+Light.DatabaseAccess.EntityFrameworkCore is compiled against .NET 8 and available as a NuGet package. It can be installed via:
 
-- **Package Reference in csproj**: `<PackageReference Include="Light.EntityFrameworkCore" Version="1.0.0" />`
-- **dotnet CLI**: `dotnet add package Light.EntityFrameworkCore`
-- **Visual Studio Package Manager Console**: `Install-Package Light.EntityFrameworkCore`
+- **Package Reference in csproj**: `<PackageReference Include="Light.DatabaseAccess.EntityFrameworkCore" Version="1.0.0" />`
+- **dotnet CLI**: `dotnet add package Light.DatabaseAccess.EntityFrameworkCore`
+- **Visual Studio Package Manager Console**: `Install-Package Light.DatabaseAccess.EntityFrameworkCore`
 
-## Why should you use Light.EntityFrameworkCore?
+## Why should you use Light.DatabaseAccess.EntityFrameworkCore?
 
 When we implement a service that wants to perform database I/O, we often see Entity Framework Core's `DbContext` used as a direct dependency. The following code example shows this for a simple CRUD update operation:
 
@@ -76,7 +76,7 @@ public interface IUpdateContactSession : IAsyncSession
 }
 ```
 
-The `IAsyncSession` interface is part of Light.SharedCore and provides the `SaveChangesAsync` method as well as the capability to dispose the session. To easily implement this interface, use the abstract base classes of **Light.EntityFrameworkCore**:
+The `IAsyncSession` interface is part of Light.SharedCore and provides the `SaveChangesAsync` method as well as the capability to dispose the session. To easily implement this interface, use the abstract base classes of **Light.DatabaseAccess.EntityFrameworkCore**:
 
 ```csharp
 public sealed class EfUpdateContactSession : EfAsyncSession<MyDbContext>, IUpdateContactSession
@@ -146,7 +146,7 @@ services.AddScoped<IUpdateContactSession, EfUpdateContactSession>();
 
 You can now easily replace the `EfUpdateContactSession` with any other implementation of `IUpdateContactSession` without changing the business logic, and easily implement your own in-memory mock for unit tests.
 
-## The base classes of Light.EntityFrameworkCore
+## The base classes of Light.DatabaseAccess.EntityFrameworkCore
 
 Light.SharedCore provides two essential interfaces for database access:
 

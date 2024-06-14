@@ -1,0 +1,1 @@
+dotnet pack ./Light.DatabaseAccess.EntityFrameworkCore.csproj -c Release /p:SignAssembly=true /p:AssemblyOriginatorKeyFile=./bin/Light.DatabaseAccess.EntityFrameworkCore.snk /p:ContinuousIntegrationBuild=true
