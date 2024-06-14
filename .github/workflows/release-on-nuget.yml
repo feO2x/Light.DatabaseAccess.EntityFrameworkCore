@@ -1,0 +1,36 @@
+name: Release to NuGet
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      dotnetVersion:
+        description: "The version of .NET to use"
+        required: false
+        default: "8.0.x"
+
+jobs:
+  release-to-nuget:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ github.event.inputs.dotnetVersion || '8.0.x' }}
+      - name: Prepare SNK file
+        env:
+          LIGHT_ENTITYFRAMEWORKCORE_SNK: ${{ secrets.LIGHT_ENTITYFRAMEWORKCORE_SNK }}
+        run: |
+          echo $LIGHT_ENTITYFRAMEWORKCORE_SNK | base64 --decode > ./Light.EntityFrameworkCore/Light.EntityFrameworkCore.snk
+      - name: Create NuGet packages
+        run: dotnet pack ./Light.EntityFrameworkCore/Light.EntityFrameworkCore.csproj -c Release /p:SignAssembly=true /p:AssemblyOriginatorKeyFile=Light.EntityFrameworkCore.snk /p:ContinuousIntegrationBuild=true
+      - name: Delete SNK file
+        run: rm ./Light.EntityFrameworkCore/Light.EntityFrameworkCore.snk
+      - name: Push nupkg package
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: dotnet nuget push "./Light.EntityFrameworkCore/bin/Release/Light.EntityFrameworkCore.*.nupkg" --api-key $NUGET_API_KEY --source https://api.nuget.org/v3/index.json

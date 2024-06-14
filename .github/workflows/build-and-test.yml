@@ -1,0 +1,38 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [main]
+    paths:
+      [
+        "Light.EntityFrameworkCore/**",
+        "Light.EntityFrameworkCore.Tests/**",
+        "Light.EntityFrameworkCore.sln",
+        "build-and-test.yml",
+      ]
+  pull_request:
+    branches: [main]
+    paths:
+      [
+        "Light.EntityFrameworkCore/**",
+        "Light.EntityFrameworkCore.Tests/**",
+        "Light.EntityFrameworkCore.sln",
+        "build-and-test.yml",
+      ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Restore dependencies
+        run: dotnet restore ./Light.EntityFrameworkCore.sln
+      - name: Build
+        run: dotnet build ./Light.EntityFrameworkCore.sln -c Release --no-restore
+      - name: Test
+        run: dotnet test ./Light.EntityFrameworkCore.Tests/Light.EntityFrameworkCore.Tests.csproj -c Release --no-build --verbosity normal
