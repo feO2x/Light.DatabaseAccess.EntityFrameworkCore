@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Light.EntityFrameworkCore.Tests.DatabaseAccess.Migrations
+namespace Light.DatabaseAccess.EntityFrameworkCore.Tests.DatabaseAccess.Migrations
 {
     /// <inheritdoc />
     public partial class InitialSetup : Migration

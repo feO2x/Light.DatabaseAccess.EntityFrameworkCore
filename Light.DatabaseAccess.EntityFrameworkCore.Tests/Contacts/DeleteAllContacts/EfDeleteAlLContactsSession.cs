@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Light.DatabaseAccess.EntityFrameworkCore.Tests.DatabaseAccess;
-using Light.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Light.DatabaseAccess.EntityFrameworkCore.Tests.Contacts.DeleteAllContacts;
