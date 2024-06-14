@@ -5,18 +5,18 @@ on:
     branches: [main]
     paths:
       [
-        "Light.EntityFrameworkCore/**",
-        "Light.EntityFrameworkCore.Tests/**",
-        "Light.EntityFrameworkCore.sln",
+        "Light.DatabaseAccess.EntityFrameworkCore/**",
+        "Light.DatabaseAccess.EntityFrameworkCore.Tests/**",
+        "Light.DatabaseAccess.EntityFrameworkCore.sln",
         "build-and-test.yml",
       ]
   pull_request:
     branches: [main]
     paths:
       [
-        "Light.EntityFrameworkCore/**",
-        "Light.EntityFrameworkCore.Tests/**",
-        "Light.EntityFrameworkCore.sln",
+        "Light.DatabaseAccess.EntityFrameworkCore/**",
+        "Light.DatabaseAccess.EntityFrameworkCore.Tests/**",
+        "Light.DatabaseAccess.EntityFrameworkCore.sln",
         "build-and-test.yml",
       ]
 
@@ -31,8 +31,8 @@ jobs:
         with:
           dotnet-version: 8.0.x
       - name: Restore dependencies
-        run: dotnet restore ./Light.EntityFrameworkCore.sln
+        run: dotnet restore ./Light.DatabaseAccess.EntityFrameworkCore.sln
       - name: Build
-        run: dotnet build ./Light.EntityFrameworkCore.sln -c Release --no-restore
+        run: dotnet build ./Light.DatabaseAccess.EntityFrameworkCore.sln -c Release --no-restore
       - name: Test
-        run: dotnet test ./Light.EntityFrameworkCore.Tests/Light.EntityFrameworkCore.Tests.csproj -c Release --no-build --verbosity normal
+        run: dotnet test ./Light.DatabaseAccess.EntityFrameworkCore.Tests/Light.DatabaseAccess.EntityFrameworkCore.Tests.csproj -c Release --no-build --verbosity normal

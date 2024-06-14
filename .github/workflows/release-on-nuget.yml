@@ -23,14 +23,14 @@ jobs:
           dotnet-version: ${{ github.event.inputs.dotnetVersion || '8.0.x' }}
       - name: Prepare SNK file
         env:
-          LIGHT_ENTITYFRAMEWORKCORE_SNK: ${{ secrets.LIGHT_ENTITYFRAMEWORKCORE_SNK }}
+          SNK: ${{ secrets.SNK }}
         run: |
-          echo $LIGHT_ENTITYFRAMEWORKCORE_SNK | base64 --decode > ./Light.EntityFrameworkCore/Light.EntityFrameworkCore.snk
+          echo $SNK | base64 --decode > ./Light.DatabaseAccess.EntityFrameworkCore/Light.DatabaseAccess.EntityFrameworkCore.snk
       - name: Create NuGet packages
-        run: dotnet pack ./Light.EntityFrameworkCore/Light.EntityFrameworkCore.csproj -c Release /p:SignAssembly=true /p:AssemblyOriginatorKeyFile=Light.EntityFrameworkCore.snk /p:ContinuousIntegrationBuild=true
+        run: dotnet pack ./Light.DatabaseAccess.EntityFrameworkCore/Light.DatabaseAccess.EntityFrameworkCore.csproj -c Release /p:SignAssembly=true /p:AssemblyOriginatorKeyFile=Light.DatabaseAccess.EntityFrameworkCore.snk /p:ContinuousIntegrationBuild=true
       - name: Delete SNK file
-        run: rm ./Light.EntityFrameworkCore/Light.EntityFrameworkCore.snk
+        run: rm ./Light.DatabaseAccess.EntityFrameworkCore/Light.DatabaseAccess.EntityFrameworkCore.snk
       - name: Push nupkg package
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-        run: dotnet nuget push "./Light.EntityFrameworkCore/bin/Release/Light.EntityFrameworkCore.*.nupkg" --api-key $NUGET_API_KEY --source https://api.nuget.org/v3/index.json
+        run: dotnet nuget push "./Light.DatabaseAccess.EntityFrameworkCore/bin/Release/Light.DatabaseAccess.EntityFrameworkCore.*.nupkg" --api-key $NUGET_API_KEY --source https://api.nuget.org/v3/index.json
