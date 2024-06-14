@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Light.SharedCore.DatabaseAccessAbstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Light.EntityFrameworkCore;
+namespace Light.DatabaseAccess.EntityFrameworkCore;
 
 /// <summary>
 /// <para>

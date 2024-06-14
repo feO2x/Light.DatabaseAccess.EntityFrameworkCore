@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
-namespace Light.EntityFrameworkCore.Tests.DatabaseAccess;
+namespace Light.DatabaseAccess.EntityFrameworkCore.Tests.DatabaseAccess;
 
 public sealed class MyDbContextDesignTimeFactory : IDesignTimeDbContextFactory<MyDbContext>
 {

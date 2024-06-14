@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace Light.EntityFrameworkCore.Tests.Contacts.DeleteAllContacts;
+namespace Light.DatabaseAccess.EntityFrameworkCore.Tests.Contacts.DeleteAllContacts;
 
 public sealed class DeleteAllContactsService
 {

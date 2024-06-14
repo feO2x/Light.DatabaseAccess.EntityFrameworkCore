@@ -1,8 +1,8 @@
-using Light.EntityFrameworkCore.Tests.Contacts.GetAllContacts;
-using Light.EntityFrameworkCore.Tests.DatabaseAccess.Model;
+using Light.DatabaseAccess.EntityFrameworkCore.Tests.Contacts.GetAllContacts;
+using Light.DatabaseAccess.EntityFrameworkCore.Tests.DatabaseAccess.Model;
 using Light.SharedCore.DatabaseAccessAbstractions;
 
-namespace Light.EntityFrameworkCore.Tests.Contacts.ManipulateContacts;
+namespace Light.DatabaseAccess.EntityFrameworkCore.Tests.Contacts.ManipulateContacts;
 
 public interface IManipulateContactsSession : IGetAllContactsSession, IAsyncSession
 {

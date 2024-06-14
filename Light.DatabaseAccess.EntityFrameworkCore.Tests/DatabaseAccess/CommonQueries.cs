@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Light.EntityFrameworkCore.Tests.DatabaseAccess.Model;
+using Light.DatabaseAccess.EntityFrameworkCore.Tests.DatabaseAccess.Model;
 using Microsoft.EntityFrameworkCore;
 
-namespace Light.EntityFrameworkCore.Tests.DatabaseAccess;
+namespace Light.DatabaseAccess.EntityFrameworkCore.Tests.DatabaseAccess;
 
 public static class CommonQueries
 {

@@ -1,16 +1,16 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
-using Light.EntityFrameworkCore.Tests.Contacts.DeleteAllContacts;
-using Light.EntityFrameworkCore.Tests.Contacts.GetAllContacts;
-using Light.EntityFrameworkCore.Tests.Contacts.ManipulateContacts;
-using Light.EntityFrameworkCore.Tests.DatabaseAccess;
-using Light.EntityFrameworkCore.Tests.DatabaseAccess.Model;
+using Light.DatabaseAccess.EntityFrameworkCore.Tests.Contacts.DeleteAllContacts;
+using Light.DatabaseAccess.EntityFrameworkCore.Tests.Contacts.GetAllContacts;
+using Light.DatabaseAccess.EntityFrameworkCore.Tests.Contacts.ManipulateContacts;
+using Light.DatabaseAccess.EntityFrameworkCore.Tests.DatabaseAccess;
+using Light.DatabaseAccess.EntityFrameworkCore.Tests.DatabaseAccess.Model;
 using Light.Xunit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace Light.EntityFrameworkCore.Tests;
+namespace Light.DatabaseAccess.EntityFrameworkCore.Tests;
 
 [TestCaseOrderer(TestOrderer.TypeName, TestOrderer.AssemblyName)]
 public sealed class PostgresIntegrationTests : IClassFixture<PostgresFixture>, IAsyncLifetime

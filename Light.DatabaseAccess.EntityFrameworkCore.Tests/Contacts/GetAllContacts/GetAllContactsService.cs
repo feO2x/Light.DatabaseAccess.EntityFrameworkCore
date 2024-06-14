@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Light.EntityFrameworkCore.Tests.DatabaseAccess.Model;
+using Light.DatabaseAccess.EntityFrameworkCore.Tests.DatabaseAccess.Model;
 
-namespace Light.EntityFrameworkCore.Tests.Contacts.GetAllContacts;
+namespace Light.DatabaseAccess.EntityFrameworkCore.Tests.Contacts.GetAllContacts;
 
 public sealed class GetAllContactsService
 {

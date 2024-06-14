@@ -1,11 +1,11 @@
 using System.Threading.Tasks;
-using Light.EntityFrameworkCore.Tests.DatabaseAccess;
-using Light.EntityFrameworkCore.Tests.DatabaseAccess.Model;
+using Light.DatabaseAccess.EntityFrameworkCore.Tests.DatabaseAccess;
+using Light.DatabaseAccess.EntityFrameworkCore.Tests.DatabaseAccess.Model;
 using Microsoft.EntityFrameworkCore;
 using Testcontainers.PostgreSql;
 using Xunit;
 
-namespace Light.EntityFrameworkCore.Tests;
+namespace Light.DatabaseAccess.EntityFrameworkCore.Tests;
 
 public sealed class PostgresFixture : IAsyncLifetime
 {

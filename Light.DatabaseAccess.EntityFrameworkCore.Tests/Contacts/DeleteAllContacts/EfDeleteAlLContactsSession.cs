@@ -1,10 +1,11 @@
 ﻿using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
-using Light.EntityFrameworkCore.Tests.DatabaseAccess;
+using Light.DatabaseAccess.EntityFrameworkCore.Tests.DatabaseAccess;
+using Light.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace Light.EntityFrameworkCore.Tests.Contacts.DeleteAllContacts;
+namespace Light.DatabaseAccess.EntityFrameworkCore.Tests.Contacts.DeleteAllContacts;
 
 public sealed class EfDeleteAlLContactsSession : EfAsyncSession<MyDbContext>.WithTransaction, IDeleteAllContactsSession
 {

@@ -8,7 +8,7 @@ using Light.SharedCore.DatabaseAccessAbstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace Light.EntityFrameworkCore;
+namespace Light.DatabaseAccess.EntityFrameworkCore;
 
 /// <summary>
 /// <para>

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Light.SharedCore.Entities;
 
-namespace Light.EntityFrameworkCore.Tests.DatabaseAccess.Model;
+namespace Light.DatabaseAccess.EntityFrameworkCore.Tests.DatabaseAccess.Model;
 
 public sealed class Contact : GuidEntity
 {

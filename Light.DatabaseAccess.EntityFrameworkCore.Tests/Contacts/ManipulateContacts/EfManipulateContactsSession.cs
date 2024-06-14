@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Light.EntityFrameworkCore.Tests.DatabaseAccess;
-using Light.EntityFrameworkCore.Tests.DatabaseAccess.Model;
+using Light.DatabaseAccess.EntityFrameworkCore.Tests.DatabaseAccess;
+using Light.DatabaseAccess.EntityFrameworkCore.Tests.DatabaseAccess.Model;
+using Light.EntityFrameworkCore;
 
-namespace Light.EntityFrameworkCore.Tests.Contacts.ManipulateContacts;
+namespace Light.DatabaseAccess.EntityFrameworkCore.Tests.Contacts.ManipulateContacts;
 
 public sealed class EfManipulateContactsSession : EfAsyncSession<MyDbContext>, IManipulateContactsSession
 {

@@ -2,7 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Light.SharedCore.DatabaseAccessAbstractions;
 
-namespace Light.EntityFrameworkCore.Tests.Contacts.DeleteAllContacts;
+namespace Light.DatabaseAccess.EntityFrameworkCore.Tests.Contacts.DeleteAllContacts;
 
 public interface IDeleteAllContactsSession : IAsyncSession
 {
