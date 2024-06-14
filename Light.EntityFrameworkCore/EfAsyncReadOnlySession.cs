@@ -140,8 +140,10 @@ public abstract class EfAsyncReadOnlySession<TDbContext> : IAsyncReadOnlySession
         [MemberNotNull(nameof(_transaction))]
         private async ValueTask<TDbContext> InitializeAndGetDbContextAsync(CancellationToken cancellationToken)
         {
+#pragma warning disable 8774 // the warning is incorrect when the caller awaits the GetDbContextAsync method
             _transaction = await _dbContext.Database.BeginTransactionAsync(_isolationLevel, cancellationToken);
             return _dbContext;
+#pragma warning restore 8774
         }
 
         /// <summary>
