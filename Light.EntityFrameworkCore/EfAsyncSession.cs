@@ -29,8 +29,16 @@ public abstract class EfAsyncSession<TDbContext> : EfAsyncReadOnlySession<TDbCon
     /// Initializes a new instance of <see cref="EfAsyncSession{TDbContext}" />.
     /// </summary>
     /// <param name="dbContext">The DB context used to access the database.</param>
+    /// <param name="queryTrackingBehavior">
+    /// The value indicating how the results of a query are tracked by the change tracker of the DB context.
+    /// The default value is <see cref="QueryTrackingBehavior.TrackAll" />.
+    /// </param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="dbContext" /> is null.</exception>
-    protected EfAsyncSession(TDbContext dbContext) : base(dbContext) { }
+    protected EfAsyncSession(
+        TDbContext dbContext,
+        QueryTrackingBehavior queryTrackingBehavior = QueryTrackingBehavior.TrackAll
+    )
+        : base(dbContext, queryTrackingBehavior) { }
 
     /// <summary>
     /// Saves the changes in the DB context.
@@ -64,8 +72,16 @@ public abstract class EfAsyncSession<TDbContext> : EfAsyncReadOnlySession<TDbCon
         /// The isolation level that is used for the underlying transaction.
         /// The default value is <see cref="IsolationLevel.ReadCommitted" />.
         /// </param>
+        /// <param name="queryTrackingBehavior">
+        /// The value indicating how the results of a query are tracked by the change tracker of the DB context.
+        /// The default value is <see cref="QueryTrackingBehavior.TrackAll" />.
+        /// </param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="dbContext" /> is null.</exception>
-        protected WithTransaction(TDbContext dbContext, IsolationLevel isolationLevel = IsolationLevel.ReadCommitted)
+        protected WithTransaction(
+            TDbContext dbContext,
+            IsolationLevel isolationLevel = IsolationLevel.ReadCommitted,
+            QueryTrackingBehavior queryTrackingBehavior = QueryTrackingBehavior.TrackAll
+        )
             : base(dbContext, isolationLevel) { }
 
         /// <summary>

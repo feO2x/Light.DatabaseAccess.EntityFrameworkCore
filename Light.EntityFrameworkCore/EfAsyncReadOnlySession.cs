@@ -32,8 +32,19 @@ public abstract class EfAsyncReadOnlySession<TDbContext> : IAsyncReadOnlySession
     /// Initializes a new instance of <see cref="EfAsyncReadOnlySession{TDbContext}" />
     /// </summary>
     /// <param name="dbContext">The DB context used to access the database.</param>
+    /// <param name="queryTrackingBehavior">
+    /// The value indicating how the results of a query are tracked by the change tracker of the DB context.
+    /// The default value is <see cref="QueryTrackingBehavior.NoTrackingWithIdentityResolution" />.
+    /// </param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="dbContext" /> is null.</exception>
-    protected EfAsyncReadOnlySession(TDbContext dbContext) => DbContext = dbContext.MustNotBeNull();
+    protected EfAsyncReadOnlySession(
+        TDbContext dbContext,
+        QueryTrackingBehavior queryTrackingBehavior = QueryTrackingBehavior.NoTrackingWithIdentityResolution
+    )
+    {
+        DbContext = dbContext.MustNotBeNull();
+        dbContext.ChangeTracker.QueryTrackingBehavior = queryTrackingBehavior;
+    }
 
     /// <summary>
     /// Gets the DB context used to access the database.
@@ -78,10 +89,19 @@ public abstract class EfAsyncReadOnlySession<TDbContext> : IAsyncReadOnlySession
         /// The isolation level that is used for the underlying transaction.
         /// The default value is <see cref="IsolationLevel.ReadCommitted" />.
         /// </param>
+        /// <param name="queryTrackingBehavior">
+        /// The value indicating how the results of a query are tracked by the change tracker of the DB context.
+        /// The default value is <see cref="QueryTrackingBehavior.NoTrackingWithIdentityResolution" />.
+        /// </param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="dbContext" /> is null.</exception>
-        protected WithTransaction(TDbContext dbContext, IsolationLevel isolationLevel = IsolationLevel.ReadCommitted)
+        protected WithTransaction(
+            TDbContext dbContext,
+            IsolationLevel isolationLevel = IsolationLevel.ReadCommitted,
+            QueryTrackingBehavior queryTrackingBehavior = QueryTrackingBehavior.NoTrackingWithIdentityResolution
+        )
         {
             _dbContext = dbContext.MustNotBeNull();
+            dbContext.ChangeTracker.QueryTrackingBehavior = queryTrackingBehavior;
             _isolationLevel = isolationLevel;
         }
 
