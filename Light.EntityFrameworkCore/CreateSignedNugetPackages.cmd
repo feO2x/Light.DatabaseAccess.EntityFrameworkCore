@@ -1,0 +1,1 @@
+dotnet pack ./Light.EntityFrameworkCore.csproj -c Release /p:SignAssembly=true /p:AssemblyOriginatorKeyFile=./bin/Light.EntityFrameworkCore.snk /p:ContinuousIntegrationBuild=true
