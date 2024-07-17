@@ -82,7 +82,7 @@ public abstract class EfAsyncSession<TDbContext> : EfAsyncReadOnlySession<TDbCon
             IsolationLevel isolationLevel = IsolationLevel.ReadCommitted,
             QueryTrackingBehavior queryTrackingBehavior = QueryTrackingBehavior.TrackAll
         )
-            : base(dbContext, isolationLevel) { }
+            : base(dbContext, isolationLevel, queryTrackingBehavior) { }
 
         /// <summary>
         /// Saves the changes in the DB context and commits the transaction.
