@@ -5,13 +5,13 @@
 ![Light Logo](light-logo.png)
 
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://github.com/feO2x/Light.DatabaseAccess.EntityFrameworkCore/blob/main/LICENSE)
-[![NuGet](https://img.shields.io/badge/NuGet-1.0.0-blue.svg?style=for-the-badge)](https://www.nuget.org/packages/Light.DatabaseAccess.EntityFrameworkCore/)
+[![NuGet](https://img.shields.io/badge/NuGet-1.0.1-blue.svg?style=for-the-badge)](https://www.nuget.org/packages/Light.DatabaseAccess.EntityFrameworkCore/)
 
 ## How to install
 
 Light.DatabaseAccess.EntityFrameworkCore is compiled against .NET 8 and available as a NuGet package. It can be installed via:
 
-- **Package Reference in csproj**: `<PackageReference Include="Light.DatabaseAccess.EntityFrameworkCore" Version="1.0.0" />`
+- **Package Reference in csproj**: `<PackageReference Include="Light.DatabaseAccess.EntityFrameworkCore" Version="1.0.1" />`
 - **dotnet CLI**: `dotnet add package Light.DatabaseAccess.EntityFrameworkCore`
 - **Visual Studio Package Manager Console**: `Install-Package Light.DatabaseAccess.EntityFrameworkCore`
 
