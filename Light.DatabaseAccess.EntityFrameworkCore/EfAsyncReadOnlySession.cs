@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Data;
+using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using Light.GuardClauses;
 using Light.SharedCore.DatabaseAccessAbstractions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Light.DatabaseAccess.EntityFrameworkCore;
@@ -106,6 +108,28 @@ public abstract class EfAsyncReadOnlySession<TDbContext> : IAsyncReadOnlySession
         }
 
         /// <summary>
+        /// <para>
+        /// Gets the DB context used to access the database. Initializes the transaction if it is not
+        /// already initialized.
+        /// </para>
+        /// <para>
+        /// PLEASE NOTE: there is an asynchronous method <see cref="GetDbContextAsync" /> which initializes
+        /// the transaction asynchronously. However, many ADO.NET providers like Npgsql simply indicate
+        /// to the next command being executed that there should be a BEGIN TRANSACTION statement at the beginning
+        /// of the SQL script, which is why it is usually OK to use this property synchronously.
+        /// Also, you can use this property when you are sure that the transaction is already initialized.
+        /// </para>
+        /// </summary>
+        public TDbContext DbContext
+        {
+            get
+            {
+                _transaction ??= _dbContext.Database.BeginTransaction();
+                return _dbContext;
+            }
+        }
+
+        /// <summary>
         /// Disposes the underlying transaction and the DB context.
         /// </summary>
         public void Dispose()
@@ -128,7 +152,8 @@ public abstract class EfAsyncReadOnlySession<TDbContext> : IAsyncReadOnlySession
         }
 
         /// <summary>
-        /// Gets the DB context used to access the database.
+        /// Gets the DB context used to access the database. Initializes the transaction if it is not
+        /// already initialized.
         /// </summary>
         /// <param name="cancellationToken">An optional token to cancel the operation.</param>
         [MemberNotNull(nameof(_transaction))]
