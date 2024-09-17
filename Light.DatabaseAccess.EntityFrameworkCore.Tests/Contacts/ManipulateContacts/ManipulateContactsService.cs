@@ -27,7 +27,7 @@ public sealed class ManipulateContactsService
 
     public static List<Contact> GetExpectedManipulatedContacts()
     {
-        var contactsCopy = Contact.DefaultContacts.ToList();
+        var contactsCopy = AllContacts.DefaultContacts.ToList();
         contactsCopy[1].LastName = "Porter";
         contactsCopy.RemoveAt(2);
         return contactsCopy;

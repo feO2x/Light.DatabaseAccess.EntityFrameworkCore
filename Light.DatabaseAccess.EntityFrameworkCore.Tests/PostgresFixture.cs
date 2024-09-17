@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Light.DatabaseAccess.EntityFrameworkCore.Tests.Contacts;
 using Light.DatabaseAccess.EntityFrameworkCore.Tests.DatabaseAccess;
 using Light.DatabaseAccess.EntityFrameworkCore.Tests.DatabaseAccess.Model;
 using Microsoft.EntityFrameworkCore;
@@ -28,7 +29,7 @@ public sealed class PostgresFixture : IAsyncLifetime
            .Options;
         await using var dbContext = new MyDbContext(dbContextOptions);
         await dbContext.Database.MigrateAsync();
-        dbContext.Contacts.AddRange(Contact.DefaultContacts);
+        dbContext.Contacts.AddRange(AllContacts.DefaultContacts);
         await dbContext.SaveChangesAsync();
     }
 
