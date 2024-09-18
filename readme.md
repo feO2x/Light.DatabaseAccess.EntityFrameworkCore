@@ -5,13 +5,13 @@
 ![Light Logo](light-logo.png)
 
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://github.com/feO2x/Light.DatabaseAccess.EntityFrameworkCore/blob/main/LICENSE)
-[![NuGet](https://img.shields.io/badge/NuGet-1.0.1-blue.svg?style=for-the-badge)](https://www.nuget.org/packages/Light.DatabaseAccess.EntityFrameworkCore/)
+[![NuGet](https://img.shields.io/badge/NuGet-1.1.0-blue.svg?style=for-the-badge)](https://www.nuget.org/packages/Light.DatabaseAccess.EntityFrameworkCore/)
 
 ## How to install
 
 Light.DatabaseAccess.EntityFrameworkCore is compiled against .NET 8 and available as a NuGet package. It can be installed via:
 
-- **Package Reference in csproj**: `<PackageReference Include="Light.DatabaseAccess.EntityFrameworkCore" Version="1.0.1" />`
+- **Package Reference in csproj**: `<PackageReference Include="Light.DatabaseAccess.EntityFrameworkCore" Version="1.1.0" />`
 - **dotnet CLI**: `dotnet add package Light.DatabaseAccess.EntityFrameworkCore`
 - **Visual Studio Package Manager Console**: `Install-Package Light.DatabaseAccess.EntityFrameworkCore`
 
@@ -153,9 +153,9 @@ Light.SharedCore provides two essential interfaces for database access:
 - `IAsyncReadOnlySession`: represents a connection to the database that only reads data. Data will not be manipulated and thus a `SaveChangesAsync` method is not available. This interface is implemented by `EfAsyncReadOnlySession<TDbContext>` in this package. This base class will set the `ChangeTracker.QueryTrackingBehavior` to `NoTrackingWithIdentityResolution` by default to avoid overhead - this way, you do not need to call `AsNoTracking` or `AsNoTrackingWithIdentityResolution` in your queries. You can adjust this by passing a different `queryTrackingBehavior` value to the constructor.
 - `IAsyncSession`: represents a connection to the database which manipulates data. It has an additional `SaveChangesAsync` method to persist changes to the database. This interface is implemented by `EfAsyncSession<TDbContext>` in this package - the Query Tracking Behavior is set to `TrackAll` (the default value for EF Core's DB Context).
 
-If you want to use a dedicated transaction for a session, you can derive from the `EfAsyncSession<TDbContext>.WithTransaction` or `EfAsyncReadOnlySession<TDbContext>.WithTransaction` classes. Instead of having a `DbContext` property, these base classes provide a `GetDbContextAsync` method which will initialize the transaction upon first retrieval. This underlying transaction will be committed when `SaveChangesAsync` is called. You can pass the isolation level of the transaction via the constructor, the default value is `IsolationLevel.ReadCommitted`.
+If you want to use a dedicated transaction for a session, you can derive from the `EfAsyncSession<TDbContext>.WithTransaction` or `EfAsyncReadOnlySession<TDbContext>.WithTransaction` classes. In addition to the `DbContext` property, these base classes provide a `GetDbContextAsync` method which will initialize the transaction upon first retrieval. This underlying transaction will be committed when `SaveChangesAsync` is called. You can pass the isolation level of the transaction via the constructor, the default value is `IsolationLevel.ReadCommitted`.
 
-The `IUpdateContactSession` implementation from above would look like this when using a dedicated transaction:
+The `IUpdateContactSession` implementation from above could look like this when using a dedicated transaction:
 
 ```csharp
 public sealed class EfUpdateContactSession : EfAsyncSession<MyDbContext>.WithTransaction,
@@ -166,7 +166,7 @@ public sealed class EfUpdateContactSession : EfAsyncSession<MyDbContext>.WithTra
     
     public async Task<Contact?> GetContactAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        // The first call to GetDbContextAsync initializes the underlying transaction
+        // The first call to GetDbContextAsync initializes the underlying transaction asynchronously
         var dbContext = await GetDbContextAsync(cancellationToken); 
         return await dbContext
             .Contacts
@@ -174,6 +174,66 @@ public sealed class EfUpdateContactSession : EfAsyncSession<MyDbContext>.WithTra
     }
 }
 ```
+
+> Most ADO.NET providers like Npgsql or Microsoft.Data.SqlClient do not actually make a call to the database when BeginTransaction(Async) is called. They simply mark the next command so that it includes a BEGIN TRANSACTION statement at the beginning. Therefore, it is usually OK to simply use the `DbContext` property in your sessions deriving from `EfAsyncSession<TDbContext>.WithTransaction` or `EfAsyncReadOnlySession<TDbContext>.WithTransaction`. Please consult the documentation of your ADO.NET provider for details.
+
+## Creating ADO.NET DbCommand objects from DbContext
+
+While Entity Framework Core is powerful, you sometimes need to resort to ADO.NET for specific SQL queries. All session base classes provide a `CreateDbCommand` method that returns a fully initialized `DbCommand` object. If necessary, the DB connection will be opened and assigned to the command, the same thing is done with a possible transaction. The following code shows two examples of sessions that use commands:
+
+```csharp
+public sealed class AdoNetDeleteAllContactsSession : EfAsyncSession<MyDbContext>.WithTransaction,
+                                                     IDeleteAllContactsSession
+{
+    public AdoNetDeleteAllContactsSession(MyDbContext dbContext) : base(dbContext, IsolationLevel.Serializable) { }
+
+    public async Task DeleteAllContactsAsync(CancellationToken cancellationToken = default)
+    {
+        await using var command =
+            await CreateCommandAsync<NpgsqlCommand>("DELETE FROM \"Contacts\";", cancellationToken);
+        await command.ExecuteNonQueryAsync(cancellationToken);
+    }
+}
+
+public sealed class AdoNetGetAllContactsSession : EfAsyncReadOnlySession<MyDbContext>, IGetAllContactsSession
+{
+    public AdoNetGetAllContactsSession(MyDbContext dbContext) : base(dbContext) { }
+
+    public async Task<List<Contact>> GetContactsAsync(CancellationToken cancellationToken = default)
+    {
+        await using var command = await CreateCommandAsync<NpgsqlCommand>(
+            "SELECT \"Id\", \"FirstName\", \"LastName\", \"Email\" FROM \"Contacts\";",
+            cancellationToken
+        );
+
+        await using var reader = await command.ExecuteReaderAsync(CommandBehavior.SingleResult, cancellationToken);
+        return await DeserializeContactsAsync(reader, cancellationToken);
+    }
+
+    private static async Task<List<Contact>> DeserializeContactsAsync(
+        NpgsqlDataReader reader,
+        CancellationToken cancellationToken
+    )
+    {
+        var entities = new List<Contact>();
+        while (await reader.ReadAsync(cancellationToken))
+        {
+            var entity = new Contact
+            {
+                Id = reader.GetGuid(0),
+                FirstName = reader.GetString(1),
+                LastName = reader.IsDBNull(2) ? null : reader.GetString(2),
+                Email = reader.IsDBNull(3) ? null : reader.GetString(3)
+            };
+            entities.Add(entity);
+        }
+
+        return entities;
+    }
+}
+```
+
+Please note that DB commands usually have their own implicit READ COMMITTED transaction if you do not specify an explicit one. If you execute multiple commands within the same session, you probably want to put a transaction around them unless your queries incorporate optimistic concurrency.   
 
 ## Tips and tricks
 
