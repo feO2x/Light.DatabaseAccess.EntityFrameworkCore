@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
-        <Version>1.0.1</Version>
+        <Version>1.1.0</Version>
         <Authors>Kenny Pflug</Authors>
         <Company>Kenny Pflug</Company>
         <Copyright>Copyright © Kenny Pflug 2024</Copyright>
@@ -23,10 +23,11 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageReadmeFile>readme.md</PackageReadmeFile>
         <PackageReleaseNotes>
-Light.DatabaseAccess.EntityFrameworkCore 1.0.1
+Light.DatabaseAccess.EntityFrameworkCore 1.1.0
 --------------------------------
             
-- fix: queryTrackingBehavior is now correctly forwarded in EfAsyncSession&lt;T&gt;.WithTransaction contructor        
+- add DbContext property to .WithTransaction session base classes which allows synchronous access to the DbContext
+- add CreateCommandAsync to all session base classes, which allows you to easily create fully initialized DB commands 
 - read all the docs at https://github.com/feO2x/Light.DatabaseAccess.EntityFrameworkCore/
         </PackageReleaseNotes>
     </PropertyGroup>
