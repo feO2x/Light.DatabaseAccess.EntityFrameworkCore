@@ -65,7 +65,7 @@ public sealed class UpdateContactService
 }
 ```
 
-This piece of domain logic is tightly coupled to Entity Framework Core, it cannot be run without it. In Unit Tests where we want to replace the I/O calls with a test double, we cannot simply implement a mock on our own, we need to rely on the capabilities of mocking frameworks like NSubstitute or Moq which only work by using reflection internally. Furthermore, what if we want to replace EF Core with e.g. Dapper or plain ADO.NET for certain endpoints to benefit from their performance characteristics? While not impossible, this would result in specifics like SQL statements being spread across our business logic, because we did not separate database access from the domain, violating the Single Responsibility Principle.
+This piece of domain logic is tightly coupled to Entity Framework Core, it cannot be executed without it. In Unit Tests where we want to replace the I/O calls with a test double, we cannot simply implement a mock on our own, we need to rely on the capabilities of mocking frameworks like NSubstitute or Moq which only work by using reflection internally. Furthermore, what if we want to replace EF Core with e.g. Dapper or plain ADO.NET for certain endpoints to benefit from their performance characteristics? While not impossible, this would result in specifics like SQL statements being spread across our business logic, because we did not separate database access from the domain, violating the Single Responsibility Principle.
 
 Instead, I recommend to create an interface that abstracts the database access code. For the example above, it could look like this:
 
@@ -189,6 +189,10 @@ public sealed class AdoNetDeleteAllContactsSession : EfAsyncSession<MyDbContext>
 
     public async Task DeleteAllContactsAsync(CancellationToken cancellationToken = default)
     {
+        // This CreateCommandAsync call will, if necessary, open the underlying DB connection and
+        // begin the transaction, and attach both of them to the command. This is because we derive
+        // from the .WithTransaction session base class. The first parameter is the SQL statement
+        // that is passed to the CommandText property.
         await using var command =
             await CreateCommandAsync<NpgsqlCommand>("DELETE FROM \"Contacts\";", cancellationToken);
         await command.ExecuteNonQueryAsync(cancellationToken);
@@ -201,6 +205,9 @@ public sealed class AdoNetGetAllContactsSession : EfAsyncReadOnlySession<MyDbCon
 
     public async Task<List<Contact>> GetContactsAsync(CancellationToken cancellationToken = default)
     {
+        // As we are now in a session without a transaction, CreateCommandAsync will only open the
+        // DB connection and attach it to the command. The command will use an implicit transaction
+        // with isolation level READ COMMITED while executing.
         await using var command = await CreateCommandAsync<NpgsqlCommand>(
             "SELECT \"Id\", \"FirstName\", \"LastName\", \"Email\" FROM \"Contacts\";",
             cancellationToken
@@ -233,11 +240,11 @@ public sealed class AdoNetGetAllContactsSession : EfAsyncReadOnlySession<MyDbCon
 }
 ```
 
-Please note that DB commands usually have their own implicit READ COMMITTED transaction if you do not specify an explicit one. If you execute multiple commands within the same session, you probably want to put a transaction around them unless your queries incorporate optimistic concurrency.   
+Please note that DB commands usually have their own implicit READ COMMITTED transaction if you do not specify an explicit one. If you execute multiple commands within the same session, you probably want to put a transaction around them (by deriving from one of the `.WithTransaction` base classes), unless your queries incorporate optimistic concurrency.   
 
 ## Tips and tricks
 
-- If you have a service that only reads data, use the `IAsyncReadOnlySession` interface instead of `IAsyncSession`. Derive your session implementation from `EfAsyncReadOnlySession<TDbContext>`. This way, you can ensure that no accidental writes are made to the database and follow the Dependency Inversion Principle.
+- If you have a service that only reads data, use the `IAsyncReadOnlySession` interface instead of `IAsyncSession`. Derive your session implementation from `EfAsyncReadOnlySession<TDbContext>`. This way, you can ensure that no accidental writes are made to the database and that you follow the Dependency Inversion Principle.
 - Provide a session for each use case: instead of having a single session for all database operations or for a single entity, create a session for each use case (in backend services, this means one DB session per endpoint). This keeps each of your sessions focussed. If you have queries that are used in multiple sessions, place the code in a static method and call it from all sessions. This pattern promotes Vertical Slice Architecture.
 - Do not call `SaveChangesAsync` multiple times during a scope (in ASP.NET Core, this would be an endpoint call). This will effectively negate the transactional capabilities of the database: what happens if the first `SaveChangesAsync` call succeeds, but subsequent ones fail? The database will be in an inconsistent state.
 - Do not introduce other disposable resources or finalizers in your session. A session is a [Humble Object](https://martinfowler.com/bliki/HumbleObject.html) that represents a connection with an optional transaction to one third-party system. If you want to access different services or resources, create a new session for each of them. If you want to access multiple systems for the same data (e.g. a Redis distributed cache and the database), use pipes and filters with a dedicated session for each filter in the pipeline.
