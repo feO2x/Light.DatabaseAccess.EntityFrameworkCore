@@ -56,7 +56,8 @@ public abstract class EfAsyncReadOnlySession<TDbContext> : IAsyncReadOnlySession
     /// <summary>
     /// Disposes the DB context.
     /// </summary>
-#pragma warning disable CA1816 -- Dispose and DisposeAsync can be overridden by reimplementing the interfaces in subclasses
+    //  Dispose and DisposeAsync can be overridden by reimplementing the interfaces in subclasses
+#pragma warning disable CA1816
     public void Dispose() => DbContext.Dispose();
 
     /// <summary>
@@ -160,7 +161,8 @@ public abstract class EfAsyncReadOnlySession<TDbContext> : IAsyncReadOnlySession
         /// <summary>
         /// Disposes the underlying transaction and the DB context.
         /// </summary>
-#pragma warning disable CA1816 -- Dispose and DisposeAsync can be overridden by reimplementing the interfaces in subclasses
+        // Dispose and DisposeAsync can be overridden by reimplementing the interfaces in subclasses
+#pragma warning disable CA1816
         public void Dispose()
         {
             _transaction?.Dispose();
