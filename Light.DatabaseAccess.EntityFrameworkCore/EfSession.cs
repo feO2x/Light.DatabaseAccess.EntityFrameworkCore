@@ -9,24 +9,28 @@ namespace Light.DatabaseAccess.EntityFrameworkCore;
 
 /// <summary>
 /// <para>
-/// Represents a database session that allows to manipulate data.
-/// No dedicated transaction is used for this session - if you require it, derive from the
-/// <see cref="EfAsyncSession{TDbContext}.WithTransaction" /> class instead.
-/// If you only need to read data, derive from <see cref="EfAsyncReadOnlySession{TDbContext}" /> instead.
+/// Represents a base class for humble objects connecting to a database via an Entity Framework <see cref="DbContext"/>.
+/// This session should be used in use cases where you need to manipulate data - commit the changes by calling the
+/// session's <see cref="SaveChangesAsync"/> method.
 /// </para>
 /// <para>
-/// WARNING: do not register your derived session as a singleton or transient service with your DI container.
-/// The bases classes are not implemented in a thread-safe manner and are not designed to be used as singletons.
+/// No dedicated transaction is used for this session - if you require it, derive from the
+/// <see cref="EfSession{TDbContext}.WithTransaction" /> class instead.
+/// If you only need to read data in your use case, consider deriving from <see cref="EfClient{TDbContext}" /> instead.
+/// </para>
+/// <para>
+/// WARNING: you should not register your derived classes with your DI container using a singleton or transient lifetime.
+/// This base class is not implemented in a thread-safe manner and is not designed to be used as a singleton.
 /// Furthermore, Microsoft's DI container has issues with transient services that implement
 /// <see cref="IDisposable" /> or <see cref="IAsyncDisposable" />.
 /// </para>
 /// </summary>
 /// <typeparam name="TDbContext">The <see cref="DbContext" /> type you derived for your app.</typeparam>
-public abstract class EfAsyncSession<TDbContext> : EfAsyncReadOnlySession<TDbContext>, IAsyncSession
+public abstract class EfSession<TDbContext> : EfClient<TDbContext>, ISession
     where TDbContext : DbContext
 {
     /// <summary>
-    /// Initializes a new instance of <see cref="EfAsyncSession{TDbContext}" />.
+    /// Initializes a new instance of <see cref="EfSession{TDbContext}" />.
     /// </summary>
     /// <param name="dbContext">The DB context used to access the database.</param>
     /// <param name="queryTrackingBehavior">
@@ -34,7 +38,7 @@ public abstract class EfAsyncSession<TDbContext> : EfAsyncReadOnlySession<TDbCon
     /// The default value is <see cref="QueryTrackingBehavior.TrackAll" />.
     /// </param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="dbContext" /> is null.</exception>
-    protected EfAsyncSession(
+    protected EfSession(
         TDbContext dbContext,
         QueryTrackingBehavior queryTrackingBehavior = QueryTrackingBehavior.TrackAll
     )
@@ -49,23 +53,26 @@ public abstract class EfAsyncSession<TDbContext> : EfAsyncReadOnlySession<TDbCon
 
     /// <summary>
     /// <para>
-    /// Represents a database session that allows to manipulate data and uses a dedicated transaction.
-    /// This is useful in pessimistic concurrency scenarios or when you need a dedicated isolation level like
-    /// READ UNCOMMITED for your queries.
-    /// If you only need to read data, derive from
-    /// <see cref="EfAsyncReadOnlySession{TDbContext}.WithTransaction" /> instead.
+    /// Represents a base class for humble objects connecting to a database via an Entity Framework <see cref="DbContext"/>.
+    /// This session should be used in use cases where you need to manipulate data - commit the changes by calling the
+    /// session's <see cref="SaveChangesAsync"/> method.
+    /// </para>
+    /// <para>
+    /// A dedicated transaction is used for this session - if you do not require it, derive from the
+    /// <see cref="EfSession{TDbContext}" /> class instead.
+    /// If you only need to read data in your use case, consider deriving from <see cref="EfClient{TDbContext}.WithTransaction" /> instead.
     /// </para>
     /// <para>
     /// </para>
-    /// WARNING: do not register your derived session as a singleton or transient service with your DI container.
-    /// The bases classes are not implemented in a thread-safe manner and are not designed to be used as singletons.
+    /// WARNING: you should not register your derived classes with your DI container using a singleton or transient lifetime.
+    /// This base class is not implemented in a thread-safe manner and is not designed to be used as a singleton.
     /// Furthermore, Microsoft's DI container has issues with transient services that implement
     /// <see cref="IDisposable" /> or <see cref="IAsyncDisposable" />.
     /// </summary>
-    public new abstract class WithTransaction : EfAsyncReadOnlySession<TDbContext>.WithTransaction, IAsyncSession
+    public new abstract class WithTransaction : EfClient<TDbContext>.WithTransaction, ISession
     {
         /// <summary>
-        /// Initializes a new instance of <see cref="EfAsyncSession{TDbContext}.WithTransaction" />.
+        /// Initializes a new instance of <see cref="EfSession{TDbContext}.WithTransaction" />.
         /// </summary>
         /// <param name="dbContext">The DB context used to access the database.</param>
         /// <param name="isolationLevel">
@@ -76,7 +83,7 @@ public abstract class EfAsyncSession<TDbContext> : EfAsyncReadOnlySession<TDbCon
         /// The value indicating how the results of a query are tracked by the change tracker of the DB context.
         /// The default value is <see cref="QueryTrackingBehavior.TrackAll" />.
         /// </param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="dbContext" /> is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="dbContext" /> is nulls.</exception>
         protected WithTransaction(
             TDbContext dbContext,
             IsolationLevel isolationLevel = IsolationLevel.ReadCommitted,

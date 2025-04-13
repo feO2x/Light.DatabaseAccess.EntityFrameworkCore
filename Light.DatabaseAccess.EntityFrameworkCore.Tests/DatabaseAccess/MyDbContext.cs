@@ -3,10 +3,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Light.DatabaseAccess.EntityFrameworkCore.Tests.DatabaseAccess;
 
-public sealed class MyDbContext : DbContext
+public sealed class MyDbContext(DbContextOptions<MyDbContext> options) : DbContext(options)
 {
-    public MyDbContext(DbContextOptions<MyDbContext> options) : base(options) { }
-
     public DbSet<Contact> Contacts => Set<Contact>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

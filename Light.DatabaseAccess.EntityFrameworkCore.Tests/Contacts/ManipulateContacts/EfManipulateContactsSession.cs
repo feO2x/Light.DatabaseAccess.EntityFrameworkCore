@@ -6,7 +6,7 @@ using Light.DatabaseAccess.EntityFrameworkCore.Tests.DatabaseAccess.Model;
 
 namespace Light.DatabaseAccess.EntityFrameworkCore.Tests.Contacts.ManipulateContacts;
 
-public sealed class EfManipulateContactsSession : EfAsyncSession<MyDbContext>, IManipulateContactsSession
+public sealed class EfManipulateContactsSession : EfSession<MyDbContext>, IManipulateContactsSession
 {
     public EfManipulateContactsSession(MyDbContext dbContext) : base(dbContext) { }
     public Task<List<Contact>> GetContactsAsync(CancellationToken cancellationToken = default) =>

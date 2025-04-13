@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Light.DatabaseAccess.EntityFrameworkCore.Tests.Contacts.DeleteAllContacts;
 
-public sealed class EfDeleteAllContactsSession : EfAsyncSession<MyDbContext>.WithTransaction, IDeleteAllContactsSession
+public sealed class EfDeleteAllContactsSession : EfSession<MyDbContext>.WithTransaction, IDeleteAllContactsSession
 {
     public EfDeleteAllContactsSession(MyDbContext dbContext) : base(dbContext, IsolationLevel.Serializable) { }
     

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Light.DatabaseAccess.EntityFrameworkCore.Tests.Contacts.AddContact;
 
-public sealed class EfAddContactSession : EfAsyncSession<MyDbContext>.WithTransaction, IAddContactSession
+public sealed class EfAddContactSession : EfSession<MyDbContext>.WithTransaction, IAddContactSession
 {
     public EfAddContactSession(MyDbContext dbContext) : base(dbContext, IsolationLevel.RepeatableRead) { }
     

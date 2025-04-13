@@ -8,7 +8,7 @@ using Npgsql;
 
 namespace Light.DatabaseAccess.EntityFrameworkCore.Tests.Contacts.GetAllContacts;
 
-public sealed class AdoNetGetAllContactsSession : EfAsyncReadOnlySession<MyDbContext>, IGetAllContactsSession
+public sealed class AdoNetGetAllContactsSession : EfClient<MyDbContext>, IGetAllContactsSession
 {
     public AdoNetGetAllContactsSession(MyDbContext dbContext) : base(dbContext) { }
 

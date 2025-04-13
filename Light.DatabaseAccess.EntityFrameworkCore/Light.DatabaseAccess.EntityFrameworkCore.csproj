@@ -33,8 +33,8 @@ Light.DatabaseAccess.EntityFrameworkCore 1.1.0
     </PropertyGroup>
     
     <ItemGroup>
-        <PackageReference Include="Light.SharedCore" Version="2.0.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.7" />
+        <PackageReference Include="Light.SharedCore" Version="3.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.3" />
     </ItemGroup>
 
     <ItemGroup>

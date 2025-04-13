@@ -1,7 +1,6 @@
 using System.Threading.Tasks;
 using Light.DatabaseAccess.EntityFrameworkCore.Tests.Contacts;
 using Light.DatabaseAccess.EntityFrameworkCore.Tests.DatabaseAccess;
-using Light.DatabaseAccess.EntityFrameworkCore.Tests.DatabaseAccess.Model;
 using Microsoft.EntityFrameworkCore;
 using Testcontainers.PostgreSql;
 using Xunit;

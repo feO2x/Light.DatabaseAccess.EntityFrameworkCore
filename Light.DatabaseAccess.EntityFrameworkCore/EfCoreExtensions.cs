@@ -39,7 +39,7 @@ public static class EfCoreExtensions
         var dbConnection = dbContext.Database.GetDbConnection();
         
         return dbConnection.State == ConnectionState.Open ?
-            new ValueTask<TDbCommand>(CreateCommandAndTryAttachTransaction<TDbCommand>(dbContext, dbConnection, sql)) :
+            new (CreateCommandAndTryAttachTransaction<TDbCommand>(dbContext, dbConnection, sql)) :
             InitializeConnectionAndCreateCommandAsync<TDbCommand>(dbContext, sql, cancellationToken);
     }
     
