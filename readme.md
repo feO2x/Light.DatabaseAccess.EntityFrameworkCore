@@ -5,13 +5,13 @@
 ![Light Logo](light-logo.png)
 
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://github.com/feO2x/Light.DatabaseAccess.EntityFrameworkCore/blob/main/LICENSE)
-[![NuGet](https://img.shields.io/badge/NuGet-1.1.0-blue.svg?style=for-the-badge)](https://www.nuget.org/packages/Light.DatabaseAccess.EntityFrameworkCore/)
+[![NuGet](https://img.shields.io/badge/NuGet-3.0.0-blue.svg?style=for-the-badge)](https://www.nuget.org/packages/Light.DatabaseAccess.EntityFrameworkCore/)
 
 ## How to install
 
 Light.DatabaseAccess.EntityFrameworkCore is compiled against .NET 8 and available as a NuGet package. It can be installed via:
 
-- **Package Reference in csproj**: `<PackageReference Include="Light.DatabaseAccess.EntityFrameworkCore" Version="1.1.0" />`
+- **Package Reference in csproj**: `<PackageReference Include="Light.DatabaseAccess.EntityFrameworkCore" Version="3.0.0" />`
 - **dotnet CLI**: `dotnet add package Light.DatabaseAccess.EntityFrameworkCore`
 - **Visual Studio Package Manager Console**: `Install-Package Light.DatabaseAccess.EntityFrameworkCore`
 
@@ -70,16 +70,16 @@ This piece of domain logic is tightly coupled to Entity Framework Core, it canno
 Instead, I recommend to create an interface that abstracts the database access code. For the example above, it could look like this:
 
 ```csharp
-public interface IUpdateContactSession : IAsyncSession
+public interface IUpdateContactSession : ISession
 {
     Task<Contact?> GetContactAsync(Guid id, CancellationToken cancellationToken = default);
 }
 ```
 
-The `IAsyncSession` interface is part of Light.SharedCore and provides the `SaveChangesAsync` method as well as the capability to dispose the session. To easily implement this interface, use the abstract base classes of **Light.DatabaseAccess.EntityFrameworkCore**:
+The `ISession` interface is part of Light.SharedCore and provides the `SaveChangesAsync` method as well as the capability to dispose the session. To easily implement this interface, use the abstract base classes of **Light.DatabaseAccess.EntityFrameworkCore**:
 
 ```csharp
-public sealed class EfUpdateContactSession : EfAsyncSession<MyDbContext>, IUpdateContactSession
+public sealed class EfUpdateContactSession : EfSession<MyDbContext>, IUpdateContactSession
 {
     public EfUpdateContactSession(MyDbContext dbContext) : base(dbContext) { }
     
@@ -92,7 +92,7 @@ public sealed class EfUpdateContactSession : EfAsyncSession<MyDbContext>, IUpdat
 }
 ```
 
-The `EfAsyncSession<TDbContext>` base class implements `IAsyncSession` for you and forwards the calls `SaveChangesAsync`, `DisposeAsync`, and `Dispose` to the `DbContext`. Now, you can refactor the `UpdateContactService` to use the `IUpdateContactSession` interface:
+The `EfSession<TDbContext>` base class implements `ISession` for you and forwards the calls `SaveChangesAsync`, `DisposeAsync`, and `Dispose` to the `DbContext`. Now, you can refactor the `UpdateContactService` to use the `IUpdateContactSession` interface:
 
 ```csharp
 public sealed class UpdateContactService
@@ -144,21 +144,21 @@ For everything to work, don't forget to register the `IUpdateContactSession` in 
 services.AddScoped<IUpdateContactSession, EfUpdateContactSession>();
 ```
 
-You can now easily replace the `EfUpdateContactSession` with any other implementation of `IUpdateContactSession` without changing the business logic, and easily implement your own in-memory mock for unit tests.
+You can now easily replace the `EfUpdateContactSession` with any other implementation of `IUpdateContactSession` without changing the business logic, and easily implement your own in-memory mock for unit tests ([Light.DataAccessMocks](https://github.com/feO2x/Light.DataAccessMocks) can help you with this).
 
 ## The base classes of Light.DatabaseAccess.EntityFrameworkCore
 
-Light.SharedCore provides two essential interfaces for database access:
+Light.SharedCore uses two essential interfaces for database access:
 
-- `IAsyncReadOnlySession`: represents a connection to the database that only reads data. Data will not be manipulated and thus a `SaveChangesAsync` method is not available. This interface is implemented by `EfAsyncReadOnlySession<TDbContext>` in this package. This base class will set the `ChangeTracker.QueryTrackingBehavior` to `NoTrackingWithIdentityResolution` by default to avoid overhead - this way, you do not need to call `AsNoTracking` or `AsNoTrackingWithIdentityResolution` in your queries. You can adjust this by passing a different `queryTrackingBehavior` value to the constructor.
-- `IAsyncSession`: represents a connection to the database which manipulates data. It has an additional `SaveChangesAsync` method to persist changes to the database. This interface is implemented by `EfAsyncSession<TDbContext>` in this package - the Query Tracking Behavior is set to `TrackAll` (the default value for EF Core's DB Context).
+- `IAsyncDisposable` from the .NET BCL: represents a connection to the database. Callers do not need to interact with transactions or change tracking explicitly and thus a `SaveChangesAsync` method is not available. Sessions that derive from `IAsyncDisposable` will simply read data in most use cases. This interface is implemented by `EfClient<TDbContext>` in this package. This base class will set the `ChangeTracker.QueryTrackingBehavior` to `NoTrackingWithIdentityResolution` by default to avoid overhead - this way, you do not need to call `AsNoTracking` or `AsNoTrackingWithIdentityResolution` in your queries. You can adjust this by passing a different `queryTrackingBehavior` value to the constructor.
+- `ISession`: represents a connection to the database which manipulates data. It has an additional `SaveChangesAsync` method to persist changes to the database. This interface is implemented by `EfSession<TDbContext>` in this package - the Query Tracking Behavior is set to `TrackAll` (the default value for EF Core's DB Context).
 
-If you want to use a dedicated transaction for a session, you can derive from the `EfAsyncSession<TDbContext>.WithTransaction` or `EfAsyncReadOnlySession<TDbContext>.WithTransaction` classes. In addition to the `DbContext` property, these base classes provide a `GetDbContextAsync` method which will initialize the transaction upon first retrieval. This underlying transaction will be committed when `SaveChangesAsync` is called. You can pass the isolation level of the transaction via the constructor, the default value is `IsolationLevel.ReadCommitted`.
+If you want to use a dedicated transaction for a session, you can derive from the `EfSession<TDbContext>.WithTransaction` or `EfClient<TDbContext>.WithTransaction` classes. In addition to the `DbContext` property, these base classes provide a `GetDbContextAsync` method which will initialize the transaction upon first retrieval. This underlying transaction will be committed when `SaveChangesAsync` is called. You can pass the isolation level of the transaction via the constructor, the default value is `IsolationLevel.ReadCommitted`.
 
 The `IUpdateContactSession` implementation from above could look like this when using a dedicated transaction:
 
 ```csharp
-public sealed class EfUpdateContactSession : EfAsyncSession<MyDbContext>.WithTransaction,
+public sealed class EfUpdateContactSession : EfSession<MyDbContext>.WithTransaction,
                                              IUpdateContactSession
 {
     public EfUpdateContactSession(MyDbContext dbContext)
@@ -175,14 +175,14 @@ public sealed class EfUpdateContactSession : EfAsyncSession<MyDbContext>.WithTra
 }
 ```
 
-> Most ADO.NET providers like Npgsql or Microsoft.Data.SqlClient do not actually make a call to the database when BeginTransaction(Async) is called. They simply mark the next command so that it includes a BEGIN TRANSACTION statement at the beginning. Therefore, it is usually OK to simply use the `DbContext` property in your sessions deriving from `EfAsyncSession<TDbContext>.WithTransaction` or `EfAsyncReadOnlySession<TDbContext>.WithTransaction`. Please consult the documentation of your ADO.NET provider for details.
+> Most ADO.NET providers like Npgsql or Microsoft.Data.SqlClient do not actually make a call to the database when BeginTransaction(Async) is called. They simply mark the next command so that it includes a BEGIN TRANSACTION statement at the beginning. Therefore, it is usually OK to simply use the `DbContext` property in your sessions deriving from `EfSession<TDbContext>.WithTransaction` or `EfClient<TDbContext>.WithTransaction`. Please consult the documentation of your ADO.NET provider for details.
 
 ## Creating ADO.NET DbCommand objects from DbContext
 
-While Entity Framework Core is powerful, you sometimes need to resort to ADO.NET for specific SQL queries. All session base classes provide a `CreateDbCommand` method that returns a fully initialized `DbCommand` object. If necessary, the DB connection will be opened and assigned to the command, the same thing is done with a possible transaction. The following code shows two examples of sessions that use commands:
+While Entity Framework Core is powerful, you sometimes need to resort to ADO.NET for specific SQL queries. All base classes provide a `CreateCommandAsync<T>` method that returns a fully initialized `DbCommand` object. If necessary, the DB connection will be opened and assigned to the command, the same thing is done with a possible transaction. The following code shows two examples of sessions that use commands:
 
 ```csharp
-public sealed class AdoNetDeleteAllContactsSession : EfAsyncSession<MyDbContext>.WithTransaction,
+public sealed class AdoNetDeleteAllContactsSession : EfSession<MyDbContext>.WithTransaction,
                                                      IDeleteAllContactsSession
 {
     public AdoNetDeleteAllContactsSession(MyDbContext dbContext) : base(dbContext, IsolationLevel.Serializable) { }
@@ -199,7 +199,7 @@ public sealed class AdoNetDeleteAllContactsSession : EfAsyncSession<MyDbContext>
     }
 }
 
-public sealed class AdoNetGetAllContactsSession : EfAsyncReadOnlySession<MyDbContext>, IGetAllContactsSession
+public sealed class AdoNetGetAllContactsSession : EfClient<MyDbContext>, IGetAllContactsSession
 {
     public AdoNetGetAllContactsSession(MyDbContext dbContext) : base(dbContext) { }
 
@@ -244,10 +244,10 @@ Please note that DB commands usually have their own implicit READ COMMITTED tran
 
 ## Tips and tricks
 
-- If you have a service that only reads data, use the `IAsyncReadOnlySession` interface instead of `IAsyncSession`. Derive your session implementation from `EfAsyncReadOnlySession<TDbContext>`. This way, you can ensure that no accidental writes are made to the database and that you follow the Dependency Inversion Principle.
-- Provide a session for each use case: instead of having a single session for all database operations or for a single entity, create a session for each use case (in backend services, this means one DB session per endpoint). This keeps each of your sessions focussed. If you have queries that are used in multiple sessions, place the code in a static method and call it from all sessions. This pattern promotes Vertical Slice Architecture.
+- If you have a service that only reads data, use the `IAsyncDisposable` interface instead of `ISession`. Derive your session implementation from `EfClient<TDbContext>`. This way, you can minimize the risk of accidental writes being made to the database and that you follow the Dependency Inversion Principle.
+- Provide a humble object for each use case: instead of having a single session for all database operations or for a single entity, create a client/session for each use case (in backend services, this usually means one DB client/session per endpoint). This keeps each of your humble objects focussed. If you have queries that are used in multiple clients/sessions, place the code in a static method and call it from all implementations. This pattern promotes Vertical Slices.
 - Do not call `SaveChangesAsync` multiple times during a scope (in ASP.NET Core, this would be an endpoint call). This will effectively negate the transactional capabilities of the database: what happens if the first `SaveChangesAsync` call succeeds, but subsequent ones fail? The database will be in an inconsistent state.
-- Do not introduce other disposable resources or finalizers in your session. A session is a [Humble Object](https://martinfowler.com/bliki/HumbleObject.html) that represents a connection with an optional transaction to one third-party system. If you want to access different services or resources, create a new session for each of them. If you want to access multiple systems for the same data (e.g. a Redis distributed cache and the database), use pipes and filters with a dedicated session for each filter in the pipeline.
+- Do not introduce other disposable resources or finalizers in your client/session. A client/session is a [Humble Object](https://martinfowler.com/bliki/HumbleObject.html) that represents a connection with an optional transaction to one third-party system. If you want to access different services or resources, create a new client or session for each of them. If you want to access multiple systems for the same data (e.g. a Redis distributed cache and the database), use pipes and filters with a dedicated session for each filter in the pipeline.
 - The base classes are not implemented in a thread-safe way. Register them as a scoped dependency so that each context has its own instance. Do not use them as a singleton or transient dependency (Microsoft's DI container does not like transient dependencies that implement `IDisposable`/`IAsyncDisposable`).
 - Also follow the Dependency Inversion Principle when it comes to the design of your session interface: do not expose database-specific details, like `IQueryable<T>` or `DbSet<T>`. Instead, design the interface from the caller's perspective. This way, you can easily replace the underlying database technology without changing the business logic.
-- When designing sessions, be careful about the number of entities that you load into memory with a single operation. In GET endpoints, use proper paging and filtering to avoid loading the entire table into memory, and use `AsNoTracking` or `AsNoTrackingWithIdentityResolution` when you don't need change tracking.
+- When designing sessions, be careful about the number of entities that you load into memory with a single operation. In GET endpoints, use proper paging and filtering to avoid loading the entire table into memory, and use `AsNoTracking` or `AsNoTrackingWithIdentityResolution` when you don't need change tracking. `EfClient<TDbContext>` uses `NoTrackingWithIdentityResolution` by default, but you can override this using the corresponding constructor parameter.
