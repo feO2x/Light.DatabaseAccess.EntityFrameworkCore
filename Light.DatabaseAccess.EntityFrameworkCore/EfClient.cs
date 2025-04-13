@@ -238,7 +238,7 @@ public abstract class EfClient<TDbContext> : IAsyncDisposable, IDisposable
         // ReSharper disable once VirtualMemberNeverOverridden.Global -- can be overridden by library users
         // ReSharper disable once MemberCanBeProtected.Global
         public virtual ValueTask<TDbCommand> CreateCommandAsync<TDbCommand>(
-            string? sql,
+            string? sql = null,
             CancellationToken cancellationToken = default
         )
             where TDbCommand : DbCommand =>
