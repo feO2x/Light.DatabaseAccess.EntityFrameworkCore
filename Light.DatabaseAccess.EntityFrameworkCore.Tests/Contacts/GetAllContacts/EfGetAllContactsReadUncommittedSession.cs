@@ -7,7 +7,7 @@ using Light.DatabaseAccess.EntityFrameworkCore.Tests.DatabaseAccess.Model;
 
 namespace Light.DatabaseAccess.EntityFrameworkCore.Tests.Contacts.GetAllContacts;
 
-public sealed class EfGetAllContactsReadUncommittedSession : EfAsyncReadOnlySession<MyDbContext>.WithTransaction,
+public sealed class EfGetAllContactsReadUncommittedSession : EfClient<MyDbContext>.WithTransaction,
                                                              IGetAllContactsSession
 {
     public EfGetAllContactsReadUncommittedSession(MyDbContext dbContext) : base(

@@ -6,7 +6,7 @@ using Npgsql;
 
 namespace Light.DatabaseAccess.EntityFrameworkCore.Tests.Contacts.DeleteAllContacts;
 
-public sealed class AdoNetDeleteAllContactsSession : EfAsyncSession<MyDbContext>.WithTransaction,
+public sealed class AdoNetDeleteAllContactsSession : EfSession<MyDbContext>.WithTransaction,
                                                      IDeleteAllContactsSession
 {
     public AdoNetDeleteAllContactsSession(MyDbContext dbContext) : base(dbContext, IsolationLevel.Serializable) { }

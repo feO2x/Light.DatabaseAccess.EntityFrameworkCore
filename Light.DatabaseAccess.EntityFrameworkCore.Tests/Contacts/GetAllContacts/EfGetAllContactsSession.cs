@@ -6,7 +6,7 @@ using Light.DatabaseAccess.EntityFrameworkCore.Tests.DatabaseAccess.Model;
 
 namespace Light.DatabaseAccess.EntityFrameworkCore.Tests.Contacts.GetAllContacts;
 
-public sealed class EfGetAllContactsSession : EfAsyncReadOnlySession<MyDbContext>, IGetAllContactsSession
+public sealed class EfGetAllContactsSession : EfClient<MyDbContext>, IGetAllContactsSession
 {
     public EfGetAllContactsSession(MyDbContext dbContext) : base(dbContext) { }
 

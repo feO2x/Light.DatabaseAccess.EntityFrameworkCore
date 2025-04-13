@@ -4,7 +4,7 @@ using Light.SharedCore.DatabaseAccessAbstractions;
 
 namespace Light.DatabaseAccess.EntityFrameworkCore.Tests.Contacts.ManipulateContacts;
 
-public interface IManipulateContactsSession : IGetAllContactsSession, IAsyncSession
+public interface IManipulateContactsSession : IGetAllContactsSession, ISession
 {
     void RemoveContact(Contact contact);
 }

@@ -6,7 +6,7 @@ using Light.SharedCore.DatabaseAccessAbstractions;
 
 namespace Light.DatabaseAccess.EntityFrameworkCore.Tests.Contacts.AddContact;
 
-public interface IAddContactSession : IAsyncSession
+public interface IAddContactSession : ISession
 {
     Task<Contact?> GetContactAsync(Guid id, CancellationToken cancellationToken = default);
 

@@ -24,31 +24,34 @@ public sealed class PostgresIntegrationTests : IClassFixture<PostgresFixture>, I
     public PostgresIntegrationTests(PostgresFixture postgresFixture)
     {
         _serviceProvider = new ServiceCollection()
-           .AddDbContext<MyDbContext>(options => options.UseNpgsql(postgresFixture.ConnectionString))
-           .AddScoped<IGetAllContactsSession, EfGetAllContactsSession>()
-           .AddScoped<GetAllContactsService>()
-           .AddScoped<IAddContactSession, EfAddContactSession>()
-           .AddScoped<AddContactService>()
-           .AddScoped<IManipulateContactsSession, EfManipulateContactsSession>()
-           .AddScoped<ManipulateContactsService>()
-           .AddKeyedScoped<IGetAllContactsSession, EfGetAllContactsReadUncommittedSession>(ReadUncommittedKey)
-           .AddKeyedScoped<GetAllContactsService>(
-                ReadUncommittedKey,
-                (sp, key) => new GetAllContactsService(sp.GetRequiredKeyedService<IGetAllContactsSession>(key))
-            )
-           .AddKeyedScoped<IGetAllContactsSession, AdoNetGetAllContactsSession>(AdoNetKey)
-           .AddKeyedScoped<GetAllContactsService>(
-                AdoNetKey,
-                (sp, key) => new GetAllContactsService(sp.GetRequiredKeyedService<IGetAllContactsSession>(key))
-            )
-           .AddScoped<IDeleteAllContactsSession, EfDeleteAllContactsSession>()
-           .AddScoped<DeleteAllContactsService>()
-           .AddKeyedScoped<IDeleteAllContactsSession, AdoNetDeleteAllContactsSession>(AdoNetKey)
-           .AddKeyedScoped(
-                AdoNetKey,
-                (sp, key) => new DeleteAllContactsService(sp.GetRequiredKeyedService<IDeleteAllContactsSession>(key))
-            )
-           .BuildServiceProvider();
+                          .AddDbContext<MyDbContext>(options => options.UseNpgsql(postgresFixture.ConnectionString))
+                          .AddScoped<IGetAllContactsSession, EfGetAllContactsSession>()
+                          .AddScoped<GetAllContactsService>()
+                          .AddScoped<IAddContactSession, EfAddContactSession>()
+                          .AddScoped<AddContactService>()
+                          .AddScoped<IManipulateContactsSession, EfManipulateContactsSession>()
+                          .AddScoped<ManipulateContactsService>()
+                          .AddKeyedScoped<IGetAllContactsSession, EfGetAllContactsReadUncommittedSession>(
+                               ReadUncommittedKey)
+                          .AddKeyedScoped<GetAllContactsService>(
+                               ReadUncommittedKey,
+                               (sp, key) => new (sp.GetRequiredKeyedService<IGetAllContactsSession>(key))
+                           )
+                          .AddKeyedScoped<IGetAllContactsSession, AdoNetGetAllContactsSession>(AdoNetKey)
+                          .AddKeyedScoped<GetAllContactsService>(
+                               AdoNetKey,
+                               (sp, key) => new (sp.GetRequiredKeyedService<IGetAllContactsSession>(key))
+                           )
+                          .AddScoped<IDeleteAllContactsSession, EfDeleteAllContactsSession>()
+                          .AddScoped<DeleteAllContactsService>()
+                          .AddKeyedScoped<IDeleteAllContactsSession, AdoNetDeleteAllContactsSession>(AdoNetKey)
+                          .AddKeyedScoped(
+                               AdoNetKey,
+                               (sp, key) =>
+                                   new DeleteAllContactsService(
+                                       sp.GetRequiredKeyedService<IDeleteAllContactsSession>(key))
+                           )
+                          .BuildServiceProvider();
         _scope = _serviceProvider.CreateAsyncScope();
     }
 
@@ -74,7 +77,19 @@ public sealed class PostgresIntegrationTests : IClassFixture<PostgresFixture>, I
     public async Task GetAllContactsViaCommand()
     {
         var getAllContactsService = _scope.ServiceProvider.GetRequiredKeyedService<GetAllContactsService>(AdoNetKey);
-        
+
+        var contacts = await getAllContactsService.GetAllContactsAsync();
+
+        contacts.Should().BeEquivalentTo(AllContacts.DefaultContacts);
+    }
+
+    [Fact]
+    public async Task GetAllContactsViaCommandWithoutTransaction()
+    {
+        var dbContext = _scope.ServiceProvider.GetRequiredService<MyDbContext>();
+        await dbContext.Database.OpenConnectionAsync();
+        var getAllContactsService = _scope.ServiceProvider.GetRequiredKeyedService<GetAllContactsService>(AdoNetKey);
+
         var contacts = await getAllContactsService.GetAllContactsAsync();
 
         contacts.Should().BeEquivalentTo(AllContacts.DefaultContacts);

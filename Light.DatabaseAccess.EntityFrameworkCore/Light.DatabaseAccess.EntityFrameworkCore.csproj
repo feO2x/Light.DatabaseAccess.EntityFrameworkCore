@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
-        <Version>1.1.0</Version>
+        <Version>3.0.0</Version>
         <Authors>Kenny Pflug</Authors>
         <Company>Kenny Pflug</Company>
         <Copyright>Copyright © Kenny Pflug 2024</Copyright>
@@ -23,18 +23,20 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageReadmeFile>readme.md</PackageReadmeFile>
         <PackageReleaseNotes>
-Light.DatabaseAccess.EntityFrameworkCore 1.1.0
+Light.DatabaseAccess.EntityFrameworkCore 3.0.0
 --------------------------------
             
-- add DbContext property to .WithTransaction session base classes which allows synchronous access to the DbContext
-- add CreateCommandAsync to all session base classes, which allows you to easily create fully initialized DB commands 
+- support for Light.SharedCore 3.0.0
+- rename EfAsyncReadOnlySession&lt;TDbContext&gt; to EfClient&lt;TDbContext&gt;
+- rename EfAsyncSession&lt;TDbContext&gt; to EfSession&lt;TDbContext&gt;
+- v2.0.0 was skipped to align with Light.SharedCore versioning
 - read all the docs at https://github.com/feO2x/Light.DatabaseAccess.EntityFrameworkCore/
         </PackageReleaseNotes>
     </PropertyGroup>
     
     <ItemGroup>
-        <PackageReference Include="Light.SharedCore" Version="2.0.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.7" />
+        <PackageReference Include="Light.SharedCore" Version="3.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.3" />
     </ItemGroup>
 
     <ItemGroup>
