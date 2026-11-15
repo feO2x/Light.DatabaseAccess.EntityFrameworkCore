@@ -13,8 +13,9 @@ using Xunit;
 
 namespace Light.DatabaseAccess.EntityFrameworkCore.Tests;
 
+[Collection(PostgresCollection.Name)]
 [TestCaseOrderer(TestOrderer.TypeName, TestOrderer.AssemblyName)]
-public sealed class PostgresIntegrationTests : IClassFixture<PostgresFixture>, IAsyncLifetime
+public sealed class PostgresIntegrationTests : IAsyncLifetime
 {
     private const string ReadUncommittedKey = "ReadUncommitted";
     private const string AdoNetKey = "AdoNet";
@@ -24,34 +25,36 @@ public sealed class PostgresIntegrationTests : IClassFixture<PostgresFixture>, I
     public PostgresIntegrationTests(PostgresFixture postgresFixture)
     {
         _serviceProvider = new ServiceCollection()
-                          .AddDbContext<MyDbContext>(options => options.UseNpgsql(postgresFixture.ConnectionString))
-                          .AddScoped<IGetAllContactsSession, EfGetAllContactsSession>()
-                          .AddScoped<GetAllContactsService>()
-                          .AddScoped<IAddContactSession, EfAddContactSession>()
-                          .AddScoped<AddContactService>()
-                          .AddScoped<IManipulateContactsSession, EfManipulateContactsSession>()
-                          .AddScoped<ManipulateContactsService>()
-                          .AddKeyedScoped<IGetAllContactsSession, EfGetAllContactsReadUncommittedSession>(
-                               ReadUncommittedKey)
-                          .AddKeyedScoped<GetAllContactsService>(
-                               ReadUncommittedKey,
-                               (sp, key) => new (sp.GetRequiredKeyedService<IGetAllContactsSession>(key))
-                           )
-                          .AddKeyedScoped<IGetAllContactsSession, AdoNetGetAllContactsSession>(AdoNetKey)
-                          .AddKeyedScoped<GetAllContactsService>(
-                               AdoNetKey,
-                               (sp, key) => new (sp.GetRequiredKeyedService<IGetAllContactsSession>(key))
-                           )
-                          .AddScoped<IDeleteAllContactsSession, EfDeleteAllContactsSession>()
-                          .AddScoped<DeleteAllContactsService>()
-                          .AddKeyedScoped<IDeleteAllContactsSession, AdoNetDeleteAllContactsSession>(AdoNetKey)
-                          .AddKeyedScoped(
-                               AdoNetKey,
-                               (sp, key) =>
-                                   new DeleteAllContactsService(
-                                       sp.GetRequiredKeyedService<IDeleteAllContactsSession>(key))
-                           )
-                          .BuildServiceProvider();
+           .AddDbContext<MyDbContext>(options => options.UseNpgsql(postgresFixture.ConnectionString))
+           .AddScoped<IGetAllContactsSession, EfGetAllContactsSession>()
+           .AddScoped<GetAllContactsService>()
+           .AddScoped<IAddContactSession, EfAddContactSession>()
+           .AddScoped<AddContactService>()
+           .AddScoped<IManipulateContactsSession, EfManipulateContactsSession>()
+           .AddScoped<ManipulateContactsService>()
+           .AddKeyedScoped<IGetAllContactsSession, EfGetAllContactsReadUncommittedSession>(
+                ReadUncommittedKey
+            )
+           .AddKeyedScoped<GetAllContactsService>(
+                ReadUncommittedKey,
+                (sp, key) => new (sp.GetRequiredKeyedService<IGetAllContactsSession>(key))
+            )
+           .AddKeyedScoped<IGetAllContactsSession, AdoNetGetAllContactsSession>(AdoNetKey)
+           .AddKeyedScoped<GetAllContactsService>(
+                AdoNetKey,
+                (sp, key) => new (sp.GetRequiredKeyedService<IGetAllContactsSession>(key))
+            )
+           .AddScoped<IDeleteAllContactsSession, EfDeleteAllContactsSession>()
+           .AddScoped<DeleteAllContactsService>()
+           .AddKeyedScoped<IDeleteAllContactsSession, AdoNetDeleteAllContactsSession>(AdoNetKey)
+           .AddKeyedScoped(
+                AdoNetKey,
+                (sp, key) =>
+                    new DeleteAllContactsService(
+                        sp.GetRequiredKeyedService<IDeleteAllContactsSession>(key)
+                    )
+            )
+           .BuildServiceProvider();
         _scope = _serviceProvider.CreateAsyncScope();
     }
 
@@ -64,6 +67,7 @@ public sealed class PostgresIntegrationTests : IClassFixture<PostgresFixture>, I
     }
 
     [Fact]
+    [TestOrder(1)]
     public async Task GetAllContacts()
     {
         var getAllContactsService = _scope.ServiceProvider.GetRequiredService<GetAllContactsService>();
@@ -74,6 +78,7 @@ public sealed class PostgresIntegrationTests : IClassFixture<PostgresFixture>, I
     }
 
     [Fact]
+    [TestOrder(2)]
     public async Task GetAllContactsViaCommand()
     {
         var getAllContactsService = _scope.ServiceProvider.GetRequiredKeyedService<GetAllContactsService>(AdoNetKey);
@@ -84,6 +89,7 @@ public sealed class PostgresIntegrationTests : IClassFixture<PostgresFixture>, I
     }
 
     [Fact]
+    [TestOrder(3)]
     public async Task GetAllContactsViaCommandWithoutTransaction()
     {
         var dbContext = _scope.ServiceProvider.GetRequiredService<MyDbContext>();
@@ -96,6 +102,7 @@ public sealed class PostgresIntegrationTests : IClassFixture<PostgresFixture>, I
     }
 
     [Fact]
+    [TestOrder(4)]
     public async Task ManipulateContacts()
     {
         var manipulateContactsService = _scope.ServiceProvider.GetRequiredService<ManipulateContactsService>();
@@ -109,6 +116,7 @@ public sealed class PostgresIntegrationTests : IClassFixture<PostgresFixture>, I
     }
 
     [Fact]
+    [TestOrder(5)]
     public async Task GetAllWithReadUncommittedTransaction()
     {
         var getAllContactsService =
@@ -121,6 +129,7 @@ public sealed class PostgresIntegrationTests : IClassFixture<PostgresFixture>, I
     }
 
     [Fact]
+    [TestOrder(6)]
     public async Task AddContact()
     {
         var addContactService = _scope.ServiceProvider.GetRequiredService<AddContactService>();
@@ -135,6 +144,7 @@ public sealed class PostgresIntegrationTests : IClassFixture<PostgresFixture>, I
     }
 
     [Fact]
+    [TestOrder(7)]
     public async Task DeleteAllContacts()
     {
         var deleteAllContactsService = _scope.ServiceProvider.GetRequiredService<DeleteAllContactsService>();
@@ -146,6 +156,7 @@ public sealed class PostgresIntegrationTests : IClassFixture<PostgresFixture>, I
     }
 
     [Fact]
+    [TestOrder(8)]
     public async Task DeleteAllContactsViaCommand()
     {
         var deleteAllContactsService =

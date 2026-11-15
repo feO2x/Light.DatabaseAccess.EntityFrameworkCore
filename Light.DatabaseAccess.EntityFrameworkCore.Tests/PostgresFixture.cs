@@ -9,13 +9,11 @@ namespace Light.DatabaseAccess.EntityFrameworkCore.Tests;
 
 public sealed class PostgresFixture : IAsyncLifetime
 {
-    private const int Port = 5432;
     private readonly PostgreSqlContainer _postgresContainer =
-        new PostgreSqlBuilder()
+        new PostgreSqlBuilder("postgres:15.1")
            .WithDatabase("ContactsDb")
            .WithUsername("foo")
            .WithPassword("bar")
-           .WithPortBinding(Port)
            .Build();
 
     public string ConnectionString => _postgresContainer.GetConnectionString();

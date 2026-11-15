@@ -1,47 +1,42 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <Nullable>enable</Nullable>
-        <Version>3.0.0</Version>
-        <Authors>Kenny Pflug</Authors>
-        <Company>Kenny Pflug</Company>
-        <Copyright>Copyright © Kenny Pflug 2024</Copyright>
-        <Description>Implements the database access abstractions of Light.SharedCore for Entity Framework Core.</Description>
-        <PackageTags>database-access;entity-framework-core;ef-core;ef;session;unit-of-work</PackageTags>
-        <TreatWarningsAsErrors Condition="'$(Configuration)' == 'Release'">true</TreatWarningsAsErrors>
-        <IsPackable>true</IsPackable>
-        <PackageIcon>light-logo.png</PackageIcon>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <PackageProjectUrl>https://github.com/feO2x/Light.DatabaseAccess.EntityFrameworkCore</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/feO2x/Light.DatabaseAccess.EntityFrameworkCore.git</RepositoryUrl>
-        <RepositoryType>git</RepositoryType>
-        <PublishRepositoryUrl>true</PublishRepositoryUrl>
-        <IncludeSymbols>true</IncludeSymbols>
-        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <EmbedUntrackedSources>true</EmbedUntrackedSources>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageReadmeFile>readme.md</PackageReadmeFile>
-        <PackageReleaseNotes>
-Light.DatabaseAccess.EntityFrameworkCore 3.0.0
---------------------------------
-            
-- support for Light.SharedCore 3.0.0
-- rename EfAsyncReadOnlySession&lt;TDbContext&gt; to EfClient&lt;TDbContext&gt;
-- rename EfAsyncSession&lt;TDbContext&gt; to EfSession&lt;TDbContext&gt;
-- v2.0.0 was skipped to align with Light.SharedCore versioning
-- read all the docs at https://github.com/feO2x/Light.DatabaseAccess.EntityFrameworkCore/
-        </PackageReleaseNotes>
-    </PropertyGroup>
-    
-    <ItemGroup>
-        <PackageReference Include="Light.SharedCore" Version="3.0.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.3" />
-    </ItemGroup>
+  <PropertyGroup>
+    <Version>3.0.0</Version>
+    <Description>Implements the database access abstractions of Light.SharedCore for Entity Framework Core.</Description>
+    <PackageTags>database-access;entity-framework-core;ef-core;ef;session;unit-of-work</PackageTags>
+    <TreatWarningsAsErrors Condition="'$(Configuration)' == 'Release'">true</TreatWarningsAsErrors>
+    <IsPackable>true</IsPackable>
+    <PackageIcon>light-logo.png</PackageIcon>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageProjectUrl>https://github.com/feO2x/Light.DatabaseAccess.EntityFrameworkCore</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/feO2x/Light.DatabaseAccess.EntityFrameworkCore.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>readme.md</PackageReadmeFile>
+    <PackageReleaseNotes>
+      Light.DatabaseAccess.EntityFrameworkCore 3.0.0
+      --------------------------------
 
-    <ItemGroup>
-        <None Include="../light-logo.png" Pack="true" PackagePath="\" />
-        <None Include="../readme.md" Pack="true" PackagePath="\" />
-    </ItemGroup>
+      - support for Light.SharedCore 3.0.0
+      - rename EfAsyncReadOnlySession&lt;TDbContext&gt; to EfClient&lt;TDbContext&gt;
+      - rename EfAsyncSession&lt;TDbContext&gt; to EfSession&lt;TDbContext&gt;
+      - v2.0.0 was skipped to align with Light.SharedCore versioning
+      - read all the docs at https://github.com/feO2x/Light.DatabaseAccess.EntityFrameworkCore/
+    </PackageReleaseNotes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Light.SharedCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="../light-logo.png" Pack="true" PackagePath="\" />
+    <None Include="../readme.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
 </Project>

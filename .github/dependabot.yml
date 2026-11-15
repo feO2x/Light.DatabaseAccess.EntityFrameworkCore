@@ -1,0 +1,45 @@
+version: 2
+updates:
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    groups:
+      ef-core:
+        patterns:
+          - "Microsoft.EntityFrameworkCore*"
+          - "Npgsql.EntityFrameworkCore.PostgreSQL"
+      testing:
+        patterns:
+          - "Microsoft.NET.Test.Sdk"
+          - "Testcontainers*"
+          - "xunit*"
+    ignore:
+      # EF Core and its providers align their major version with .NET. Major updates require
+      # a new target framework, so they are done manually together with the TFM update.
+      - dependency-name: "Microsoft.EntityFrameworkCore*"
+        update-types: [ "version-update:semver-major" ]
+      - dependency-name: "Npgsql.EntityFrameworkCore.PostgreSQL"
+        update-types: [ "version-update:semver-major" ]
+      # FluentAssertions 8 and later use a commercial license. We stay pinned to 7.2.2
+      # (see Directory.Packages.props), so Dependabot must never touch this package.
+      - dependency-name: "FluentAssertions"
+
+  - package-ecosystem: "dotnet-sdk"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    ignore:
+      # Major SDK updates go hand in hand with a target framework update and are done manually.
+      - dependency-name: "*"
+        update-types: [ "version-update:semver-major" ]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
