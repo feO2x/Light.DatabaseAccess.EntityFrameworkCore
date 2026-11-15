@@ -2,22 +2,28 @@ name: Build and Test
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
     paths:
       [
         "Light.DatabaseAccess.EntityFrameworkCore/**",
         "Light.DatabaseAccess.EntityFrameworkCore.Tests/**",
         "Light.DatabaseAccess.EntityFrameworkCore.sln",
-        "build-and-test.yml",
+        "Directory.Build.props",
+        "Directory.Packages.props",
+        "global.json",
+        ".github/workflows/build-and-test.yml",
       ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
     paths:
       [
         "Light.DatabaseAccess.EntityFrameworkCore/**",
         "Light.DatabaseAccess.EntityFrameworkCore.Tests/**",
         "Light.DatabaseAccess.EntityFrameworkCore.sln",
-        "build-and-test.yml",
+        "Directory.Build.props",
+        "Directory.Packages.props",
+        "global.json",
+        ".github/workflows/build-and-test.yml",
       ]
 
 jobs:
@@ -25,11 +31,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: 8.0.x
+          global-json-file: global.json
       - name: Restore dependencies
         run: dotnet restore ./Light.DatabaseAccess.EntityFrameworkCore.sln
       - name: Build
